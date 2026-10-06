@@ -31,3 +31,29 @@ void chip8::initialize()
 
 }
 
+bool chip8::loadGame(const char* filename){
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);// Open ROM in read only (binary) and start at the end of the file
+
+    if(!file){
+        return false; //Return false if unable to open file
+    }
+
+    std::streamsize size = file.tellg(); //Get the size of the file by using the position of the pointer at the end.
+
+    file.seekg(0, std::ios::beg); //Move file read position back to the start
+
+    unsigned char* buffer = new unsigned char[size]; //Allocate enough memory to temp store the ROM
+
+    if (!file.read(reinterpret_cast<char*>(buffer), size)) { // Read ROM bytes into temp buffer
+        delete [] buffer;
+        return false;
+    }
+
+    for (int i = 0 ; i < size; ++i) {
+        memory[i + 0x200] = buffer[i]; //Copy ROM byte to chip-8 memory starting at position 0x200
+    }
+
+    delete [] buffer; //Free temporary buffer
+    return true;
+}
+
