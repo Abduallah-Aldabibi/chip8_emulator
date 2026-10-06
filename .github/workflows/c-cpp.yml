@@ -14,4 +14,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build
-        run: g++ -std=c++17 main.cpp chip8.cpp -o chip8
+        run: g++ -std=c++17 chip8.cpp -o chip8
