@@ -57,3 +57,53 @@ bool chip8::loadGame(const char* filename){
     return true;
 }
 
+void chip8::emulateCycle()
+{
+    // Fetch Opcode
+    opcode = memory[pc] << 8 | memory[pc + 1];
+    // Decode Opcode
+    switch(opcode & 0xF000) {
+        case 0xA000: // ANNN: Sets I to the address NNN
+            // Execute opcode
+            I = opcode & 0x0FFF;
+            pc += 2;
+            break;
+
+        case 0xB000:
+            pc = V[0] + (opcode & 0x0FFF);
+            break;
+
+        case 0xC000:
+            V[(opcode & 0x0F00) >> 8] = rand() + opcode & 0x00FF;
+            pc += 2;
+            break;
+        case 0xD000:
+            break;
+        case 0xE000:
+            switch(opcode & 0x00FF) {
+                case 0x009E:
+                    if(key[V[(opcode & 0x0F00) >> 8]] != 0) {
+                        pc += 2;
+                    }
+                    pc += 2;
+                    break;
+                case 0x00A1:
+                    if(key[V[(opcode & 0x0F00) >> 8]] == 0) {
+                        pc += 2;
+                    }
+                    pc += 2;
+                    break;
+            }
+        default:
+            printf("Unknown opcode: 0x%X\n", opcode);
+    }
+    // Update timers
+    if(delay_timer > 0)
+        --delay_timer;
+    if(sound_timer > 0)
+    {
+        if(sound_timer == 1)
+            printf("BEEP!\n");
+        --sound_timer;
+    }
+}
