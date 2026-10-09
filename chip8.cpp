@@ -94,6 +94,36 @@ void chip8::emulateCycle()
                     pc += 2;
                     break;
             }
+        case 0xF000:
+            switch(opcode & 0x00FF) {
+                case 0x0007:
+                    V[(opcode & 0x0F00) >> 8] = delay_timer;
+                    pc += 2;
+                    break;
+                case 0x000A:
+                    for (int i = 0; i < 16; ++i) {
+                        if (key[i]!=0) {
+                            V[(opcode & 0x0F00) >> 8] = i;
+                            pc += 2;
+                            break;
+                        }
+                    }
+                    break;
+                case 0x0015:
+                    delay_timer = V[(opcode & 0x0F00) >> 8];
+                    pc += 2;
+                    break;
+                case 0x0018:
+                    sound_timer = V[(opcode & 0x0F00) >> 8];
+                    pc += 2;
+                    break;
+                case 0x001E:
+                    I += V[(opcode & 0x0F00) >> 8];
+                    pc += 2;
+                    break;
+
+            }
+
         default:
             printf("Unknown opcode: 0x%X\n", opcode);
     }
